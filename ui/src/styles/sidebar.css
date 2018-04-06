@@ -1,0 +1,8 @@
+.drawer > div {
+    width: 200px;
+    padding-top: 70px;
+}
+
+.menu-item {
+    text-decoration: none;
+  }

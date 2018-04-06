@@ -1,0 +1,41 @@
+{
+  "name": "holiday-management",
+  "version": "1.0.0",
+  "description": "Holiday Management micro-service",
+  "main": "index.js",
+  "scripts": {
+    "start": "gulp",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "gulp rebuild"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "agenda": "^1.0.3",
+    "body-parser": "^1.18.2",
+    "config": "^1.29.4",
+    "express": "^4.16.2",
+    "mongodb": "^3.0.0-rc0",
+    "swagger-jsdoc": "^1.9.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://WlodekWielkiy@bitbucket.org/beerncodemasters/holidaysystemroot.git"
+  },
+  "devDependencies": {
+    "@types/agenda": "^1.0.1",
+    "@types/config": "0.0.34",
+    "@types/es6-promise": "^3.3.0",
+    "@types/express": "^4.11.0",
+    "@types/mongodb": "^2.2.18",
+    "@types/node": "^8.5.7",
+    "@types/swagger-jsdoc": "0.0.2",
+    "del": "^3.0.0",
+    "gulp": "^4.0.0",
+    "gulp-nodemon": "^2.2.1",
+    "gulp-sourcemaps": "^2.6.3",
+    "gulp-typescript": "^3.2.3",
+    "tslint": "^5.9.1",
+    "typescript": "^2.7.2"
+  }
+}

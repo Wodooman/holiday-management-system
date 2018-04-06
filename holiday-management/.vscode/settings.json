@@ -1,0 +1,9 @@
+{
+	"files.trimTrailingWhitespace": true,
+	"files.exclude": {
+		".git": true
+	},
+	"search.exclude": {
+		"**/node_modules": true
+	}
+}
