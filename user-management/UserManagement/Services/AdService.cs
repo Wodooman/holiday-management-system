@@ -10,10 +10,10 @@ namespace UserManagement.Services
 {
     public class AdService : IAdService
     {
-        private const string LdapDomain = "matone.materialise";
+        private const string LdapDomain = "";
         private const string LdapPath = "LDAP://matone.materialise:389/DC=matone,DC=materialise";
-        private const string LDAPUser = @"Matone\metamimicsuser";
-        private const string LDAPPassword = @"2znN4A59Z#3X%<C";
+        private const string LDAPUser = @"";
+        private const string LDAPPassword = @"";
 
         public bool ValidateCredentials(string username, string password)
         {
@@ -103,24 +103,7 @@ namespace UserManagement.Services
                 user.WhenCreated = DateTime.Parse(whencreated);
             }
 
-            return user;
-
-            /*
-Example:
-
-description=Development Engineer ASP.NET, SurgiCase Online
-displayname=Volodymyr Dubenko
-sn=Dubenko
-givenname=Volodymyr
-whencreated=26.08.2011 15:29:25
-department=Software R＆D ＆ IT
-samaccountname=Dubenko
-mail=Volodymyr.Dubenko@materialise.com
-cn=Volodymyr Dubenko
-physicaldeliveryofficename=Poland (Wroclaw)
-telephonenumber=+48 71 351 80 56
-title=Software Engineer
-       */
+            return user;       
         }
 
         private string GetPropertyValue(SearchResult searchResult, string propertyName)

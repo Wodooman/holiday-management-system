@@ -1,28 +1,21 @@
 # README #
 
-HolidaySystem
+Holiday Management System
 
 ### What is this repository for? ###
 
 * System for tracking and management holidays
-* Version
+* Version 1.0.0
 
 ### How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+* Pre-requirements together with instructions are described in README.md files inside sub-projects
 
 ### Contribution guidelines ###
 
-* Writing tests
-* Code review
-* Other guidelines
+* Code review via Pull requests (PR)
+* Testing: manually test before posting PR
 
 ### Who do I talk to? ###
 
-* Repo owner or admin
-* Other community or team contact
+* Repo owner - Wodooman
