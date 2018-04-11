@@ -125,6 +125,7 @@ router.post('/api/holidays', (req: Request, res: Response, next: express.NextFun
         container.holidaysPerYear = 'holidays26';
         container.isFirstMonthCounted = true;
         container.isNewEmployee = true;
+        container.isActive = true;
 
         holidayService.createHolidayContainer(req.body)
           .then(createdContainer => {

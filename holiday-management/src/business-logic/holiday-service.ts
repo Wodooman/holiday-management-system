@@ -48,6 +48,7 @@ export class HolidayService {
         category.sum -= holidayRequest.days;
         await dbService.updateHolidayContainer(container);
 
+        holidayRequest.isActive = true;
         return dbService.createHolidayRequest(holidayRequest);
     }
 
