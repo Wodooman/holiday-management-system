@@ -1,21 +1,24 @@
 import { MongoClient } from 'mongodb';
+import * as config from 'config';
+
 import HolidayContainer from '../models/holiday-container';
 import HolidayUpdate from '../models/holiday-update';
 import HolidayRequest from '../models/HolidayRequest';
+import AppConfiguration from '../interfaces/app-configuration';
+
+const appConfig = config.get('Config') as AppConfiguration;
 
 //TODO: Move logging to some log library instead of logging to console
-//TODO: Move configuration to config file
-const url = 'mongodb://localhost:27017';
-const dbName = 'holidayServiceDB';
+
 const holidayContainerCollection = 'holidayContainers';
 const holidayRequestCollection = 'holidayRequests';
 
 export class DbService {
     testConnection(): Promise<string> {
         return new Promise<string>((resolve, reject) => {
-            MongoClient.connect(url)
+            MongoClient.connect(appConfig.dbConnectionString)
                 .then(client => {
-                    const db = client.db(dbName);
+                    const db = client.db(appConfig.mainDbName);
                     client.close();
                     resolve('Connected to MongoDB');
                 })
@@ -25,9 +28,9 @@ export class DbService {
 
     getAllHolidayContainers(year: number = null): Promise<Array<HolidayContainer>> {
         return new Promise<Array<HolidayContainer>>((resolve, reject) => {
-            MongoClient.connect(url)
+            MongoClient.connect(appConfig.dbConnectionString)
                 .then(client => {
-                    const db = client.db(dbName);
+                    const db = client.db(appConfig.mainDbName);
                     const collection = db.collection(holidayContainerCollection);
 
                     let yearToSelect = year ? year : new Date().getFullYear();
@@ -45,9 +48,9 @@ export class DbService {
 
     createHolidayContainer(holidayContainer: HolidayContainer): Promise<HolidayContainer> {
         return new Promise<HolidayContainer>((resolve, reject) => {
-            MongoClient.connect(url)
+            MongoClient.connect(appConfig.dbConnectionString)
                 .then(client => {
-                    const db = client.db(dbName);
+                    const db = client.db(appConfig.mainDbName);
                     const collection = db.collection(holidayContainerCollection);
 
                     collection.insert(holidayContainer, (err, result) => {
@@ -63,9 +66,9 @@ export class DbService {
 
     getHolidayContainer(userId: number): Promise<HolidayContainer> {
         return new Promise<HolidayContainer>((resolve, reject) => {
-            MongoClient.connect(url)
+            MongoClient.connect(appConfig.dbConnectionString)
                 .then(client => {
-                    const db = client.db(dbName);
+                    const db = client.db(appConfig.mainDbName);
                     const collection = db.collection(holidayContainerCollection);
 
                     collection.findOne({ 'userId': userId, 'isActive': true }, (err, doc) => {
@@ -81,9 +84,9 @@ export class DbService {
 
     deleteAllHolidayContainers(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            MongoClient.connect(url)
+            MongoClient.connect(appConfig.dbConnectionString)
                 .then(client => {
-                    const db = client.db(dbName);
+                    const db = client.db(appConfig.mainDbName);
                     const collection = db.collection(holidayContainerCollection);
 
                     collection.deleteMany({});
@@ -96,15 +99,18 @@ export class DbService {
 
     updateHolidayContainer(holidayContainer: HolidayContainer): Promise<HolidayContainer> {
         return new Promise<HolidayContainer>((resolve, reject) => {
-            MongoClient.connect(url)
+            MongoClient.connect(appConfig.dbConnectionString)
                 .then(client => {
-                    const db = client.db(dbName);
+                    const db = client.db(appConfig.mainDbName);
                     const collection = db.collection(holidayContainerCollection);
 
-                    collection.update({ 'userId': holidayContainer.userId }, holidayContainer);
-                    client.close();
-
-                    resolve(holidayContainer);
+                    delete holidayContainer._id; //Note: needed as Mongo tries to update all fields, which are in the entity
+                    collection.update({ 'userId': holidayContainer.userId }, holidayContainer)
+                        .then(() => {
+                            client.close();
+                            resolve(holidayContainer);
+                        })
+                        .catch(err => reject(err));
                 })
                 .catch(error => reject(error));
         });
@@ -112,9 +118,9 @@ export class DbService {
 
     createHolidayRequest(holidayRequest: HolidayRequest): Promise<HolidayRequest> {
         return new Promise<HolidayRequest>((resolve, reject) => {
-            MongoClient.connect(url)
+            MongoClient.connect(appConfig.dbConnectionString)
                 .then(client => {
-                    const db = client.db(dbName);
+                    const db = client.db(appConfig.mainDbName);
                     const collection = db.collection(holidayRequestCollection);
 
                     collection.insert(holidayRequest, (err, result) => {
@@ -130,9 +136,9 @@ export class DbService {
 
     getHolidayRequests(userId?: number): Promise<Array<HolidayRequest>> {
         return new Promise<Array<HolidayRequest>>((resolve, reject) => {
-            MongoClient.connect(url)
+            MongoClient.connect(appConfig.dbConnectionString)
                 .then(client => {
-                    const db = client.db(dbName);
+                    const db = client.db(appConfig.mainDbName);
                     const collection = db.collection(holidayRequestCollection);
                     let request = userId === undefined ? {} : { 'userId': userId, 'isActive': true };
 
@@ -149,15 +155,18 @@ export class DbService {
 
     updateHolidayRequest(holidayRequest: HolidayRequest): Promise<HolidayRequest> {
         return new Promise<HolidayRequest>((resolve, reject) => {
-            MongoClient.connect(url)
+            MongoClient.connect(appConfig.dbConnectionString)
                 .then(client => {
-                    const db = client.db(dbName);
+                    const db = client.db(appConfig.mainDbName);
                     const collection = db.collection(holidayRequestCollection);
 
-                    collection.update({ '_id': holidayRequest._id }, holidayRequest);
-                    client.close();
-
-                    resolve(holidayRequest);
+                    delete holidayRequest._id; //Note: needed as Mongo tries to update all fields, which are in the entity
+                    collection.update({ '_id': holidayRequest._id }, holidayRequest)
+                    .then(() => {
+                        client.close();
+                        resolve(holidayRequest);
+                    })
+                    .catch(err => reject(err));
                 })
                 .catch(error => reject(error));
         });

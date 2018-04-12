@@ -1,6 +1,6 @@
 export default class HolidayRequest {
     constructor(
-        public readonly _id: string,
+        public _id: Object,
         public readonly userId: number,
         public readonly startDate: Date,
         public readonly endDate: Date,

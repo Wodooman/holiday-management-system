@@ -1,30 +1,46 @@
+import * as config from 'config';
+import { getLogger } from 'log4js';
+
 import { HolidayService } from './../business-logic/holiday-service';
 import HolidayContainer from '../models/holiday-container';
 import AppConfiguration from '../interfaces/app-configuration';
-import * as config from 'config';
+
 const holidayService = new HolidayService();
-const holidayConfig = config.get('Holidays') as AppConfiguration;
+const appConfig = config.get('Config') as AppConfiguration;
+const log = getLogger('MonthlyJob');
 
 export async function execute(): Promise<void> {
-    let containers = await holidayService.getAllHolidayContainers();
-    var today =  new Date();
-    const currentMonth = today.getMonth();
+    log.info('Started execution');
 
-    for (let i = 0; i < containers.length; i++) {
-        var container = containers[i];
-        var normalHolidays = container.categories.find(c => c.category === 'holidayNormal');
+    try {
+        let containers = await holidayService.getAllHolidayContainers().catch(err => { throw err; });
+        var today = new Date();
+        const currentMonth = today.getMonth();
 
-        var todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const startWorking = container.startDate < todayDate;
+        for (let i = 0; i < containers.length; i++) {
+            var container = containers[i];
+            var normalHolidays = container.categories.find(c => c.category === 'holidayNormal');
 
-        const firstMonth = new Date(container.startDate);
-        firstMonth.setMonth(firstMonth.getMonth() + 1);
-        const isFirstMonth = container.startDate <= today && today <= firstMonth;
+            var todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const startWorking = container.startDate <= todayDate;
 
-        if (startWorking && (!isFirstMonth || container.isFirstMonthCounted)) {
-            var daysToAdd = holidayConfig[container.holidaysPerYear][currentMonth];
-            normalHolidays.available += daysToAdd;
-            await holidayService.updateHolidayContainer(container);
+            const firstMonth = new Date(container.startDate);
+            firstMonth.setMonth(firstMonth.getMonth() + 1);
+            const isFirstMonth = container.startDate <= today && today <= firstMonth;
+
+            if (startWorking && (!isFirstMonth || container.isFirstMonthCounted)) {
+                var daysToAdd = appConfig.holidayConfig[container.holidaysPerYear][currentMonth];
+                normalHolidays.available += daysToAdd;
+                normalHolidays.sum += daysToAdd;
+                await holidayService.updateHolidayContainer(container).catch(err => { throw err; });
+                log.info(`User container ${container.userId} got ${daysToAdd} normal days`);
+            } else {
+                log.info(`User container ${container.userId} wasn't updated`);
+            }
         }
+    } catch (err) {
+        log.error(`Error: ${err}`);
     }
+
+    log.info('Finished execution');
 }

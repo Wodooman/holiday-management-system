@@ -1,0 +1,33 @@
+{
+    "appenders": {
+      "accessFile": {
+        "type": "dateFile",
+        "filename": "log/access.log",
+        "pattern": "-yyyy-MM-dd",
+        "category": "http"
+      },
+      "appFile": {
+        "type": "file",
+        "filename": "log/app.log",
+        "maxLogSize": 10485760,
+        "numBackups": 3
+      },
+      "errorFile": {
+        "type": "file",
+        "filename": "log/errors.log"
+      },
+      "errors": {
+        "type": "logLevelFilter",
+        "level": "ERROR",
+        "appender": "errorFile"
+      },
+      "console": { "type": "console" }
+    },
+    "categories": {
+      "default": { "appenders": [ "appFile", "errors", "console" ], "level": "DEBUG" },
+      "http": { "appenders": [ "accessFile"], "level": "DEBUG" },
+      "App": { "appenders": [ "appFile", "errors", "console" ], "level": "DEBUG" },
+      "MonthlyJob": { "appenders": [ "appFile", "errors", "console" ], "level": "DEBUG" },
+      "AnnualJob":  { "appenders": [ "appFile", "errors", "console" ], "level": "DEBUG" }
+    }
+  }

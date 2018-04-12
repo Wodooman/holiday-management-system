@@ -3,6 +3,7 @@ import HolidayContainerRow from './holiday-container-row';
 
 export default class HolidayContainer {
     constructor(
+        public _id: Object,
         public readonly userId: number,
         public holidaysPerYear: string = null,
         public startDate: Date = null,

@@ -1,38 +1,50 @@
+import { getLogger } from 'log4js';
+
 import { HolidayService } from './../business-logic/holiday-service';
 import HolidayContainer from '../models/holiday-container';
 import HolidayContainerRow from '../models/holiday-container-row';
-import * as config from 'config';
+
 const holidayService = new HolidayService();
+const log = getLogger('AnnualJob');
 
 export async function execute(): Promise<void> {
-    const currentYear = new Date().getFullYear();
-    const pastYear = currentYear - 1;
+    log.info('Started execution');
 
-    let containers = await holidayService.getAllHolidayContainers(pastYear);
-    for (let i = 0; i < containers.length; i++) {
-        let oldContainer = containers[i];
-        let newContainer = new HolidayContainer(oldContainer.userId, oldContainer.holidaysPerYear, oldContainer.startDate, currentYear);
-        oldContainer.isActive = false;
-        var normalCategory = oldContainer.categories.find(c => c.category === 'holidayNormal');
+    try {
+        const currentYear = new Date().getFullYear();
+        const pastYear = currentYear - 1;
 
-        for (let j = 0; j < oldContainer.categories.length; j++) {
-            var category = oldContainer.categories[j];
-            var available =
-                category.category === 'holidayFromPrevYear' ? normalCategory.sum
-                    : category.category === 'holidayOnRequest' ? 4
-                        : 0;
+        let containers = await holidayService.getAllHolidayContainers(pastYear).catch(err => { throw err; });
+        for (let i = 0; i < containers.length; i++) {
+            let oldContainer = containers[i];
+            let newContainer = new HolidayContainer(null, oldContainer.userId, oldContainer.holidaysPerYear, oldContainer.startDate, currentYear);
+            oldContainer.isActive = false;
+            var normalCategory = oldContainer.categories.find(c => c.category === 'holidayNormal');
 
-            var newCategory = new HolidayContainerRow(category.category, available, 0, available);
-            newContainer.categories.push(newCategory);
+            for (let j = 0; j < oldContainer.categories.length; j++) {
+                var category = oldContainer.categories[j];
+                var available =
+                    category.category === 'holidayFromPrevYear' ? normalCategory.sum
+                        : category.category === 'holidayOnRequest' ? 4
+                            : 0;
+
+                var newCategory = new HolidayContainerRow(category.category, available, 0, available);
+                newContainer.categories.push(newCategory);
+            }
+
+            await holidayService.updateHolidayContainer(oldContainer).catch(err => { throw err; });
+            await holidayService.createHolidayContainer(newContainer).catch(err => { throw err; });
+            log.info(`Old user container ${newContainer.userId} for year ${pastYear} deactivated and created new one - ${currentYear}`);
         }
 
-        await holidayService.updateHolidayContainer(oldContainer);
-        await holidayService.createHolidayContainer(newContainer);
+        let activeHolidayRequests = await holidayService.getHolidayRequests().catch(err => { throw err; });
+        for (var k = 0; k < activeHolidayRequests.length; k++) {
+            activeHolidayRequests[k].isActive = false;
+            await holidayService.updateHolidayRequest(activeHolidayRequests[k]).catch(err => { throw err; });
+        }
+    } catch (err) {
+        log.error(`Error: ${err}`);
     }
 
-    let activeHolidayRequests = await holidayService.getHolidayRequests();
-    for (var k = 0; k < activeHolidayRequests.length; k++) {
-        activeHolidayRequests[k].isActive = false;
-        await holidayService.updateHolidayRequest(activeHolidayRequests[k]);
-    }
+    log.info('Finished execution');
 }

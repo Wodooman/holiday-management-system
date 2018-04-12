@@ -1,63 +1,52 @@
 import * as express from 'express';
 import * as path from 'path';
-import swaggerJSDoc = require('swagger-jsdoc');
 import * as bodyParser from 'body-parser';
+import * as config from 'config';
+import { configure, getLogger, connectLogger } from 'log4js';
+
 import { router as holidays } from './controllers/holiday-controller';
 import ResponseError from './models/response-error';
 import { router as testController } from './controllers/test-controller';
+import * as Scheduler from './services/scheduler';
+import AppConfiguration from './interfaces/app-configuration';
+import * as Middlewares from './services/middlewares';
+
+const appConfig = config.get('Config') as AppConfiguration;
+configure('./config/log4js.json');
+const log = getLogger('App');
 
 const app = express();
 
-// swagger definition
-const swaggerDefinition = {
-  info: {
-    title: 'Holiday Management Service API',
-    version: '1.0.1',
-    description: 'A service for management holidays',
-  },
-  host: 'localhost:3001',
-  basePath: '/',
-};
+Scheduler.initScheduler();
 
-// options for the swagger docs
-const options = {
-  // import swaggerDefinitions
-  swaggerDefinition: swaggerDefinition,
-  // path to the API docs
-  apis: ['dist/controllers/*.js'],
-};
-
-// initialize swagger-jsdoc
-const swaggerSpec = swaggerJSDoc(options);
-
+app.use(connectLogger(getLogger('http'), { level: 'auto' }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', holidays);
 app.use('/', testController);
 
-app.get('/swagger.json', function (req: express.Request, res: express.Response) {
-  res.setHeader('Content-Type', 'application/json');
-  res.send(swaggerSpec);
-});
+Middlewares.registerSwagger(app);
 
 if (app.get('env') === 'development') {
-  app.use(function(err: ResponseError, req: express.Request, res: express.Response, next: express.NextFunction) {
+  app.use(function (err: ResponseError, req: express.Request, res: express.Response, next: express.NextFunction) {
+    log.error('Something went wrong:', err);
     res.status(err.status || 500);
     res.json({
-        message: err.message,
-        error: err
+      message: err.message,
+      error: err
     });
   });
 }
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err: ResponseError, req: express.Request, res: express.Response, next: express.NextFunction) {
-    res.status(err.status || 500);
-    res.json({
-        error: err.message,
-    });
+app.use(function (err: ResponseError, req: express.Request, res: express.Response, next: express.NextFunction) {
+  log.error('Something went wrong:', err);
+  res.status(err.status || 500);
+  res.json({
+    error: err.message,
+  });
 });
 
-app.listen(3001);
+app.listen(appConfig.hostingPort);
