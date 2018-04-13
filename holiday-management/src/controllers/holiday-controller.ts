@@ -121,7 +121,8 @@ router.post('/api/holidays', (req: Request, res: Response, next: express.NextFun
       if (!result) {
         var container = req.body as HolidayContainer;
         //TODO: replace later. Needed for testing while UI doesn't send it
-        container.startDate = new Date();
+        let date = new Date();
+        container.startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         container.holidaysPerYear = 'holidays26';
         container.isFirstMonthCounted = true;
         container.isNewEmployee = true;
