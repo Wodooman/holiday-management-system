@@ -26,7 +26,8 @@ export function initScheduler(): void {
     });
 
     agendaInstance.on('ready', function () {
-        agendaInstance.every('0 0 1 1 *', 'annually job');
+        // Note: in agenda v <= 0.9.1 there is known issue - months counted from 0 (not from 1 like it is in cron standard)
+        agendaInstance.every('0 0 1 0 *', 'annually job');
         agendaInstance.every('0 0 1 * *', 'monthly job');
 
         agendaInstance.start();
