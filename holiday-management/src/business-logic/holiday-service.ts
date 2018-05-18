@@ -4,6 +4,7 @@ import HolidayUpdate from '../models/holiday-update';
 import HolidayRequest from '../models/HolidayRequest';
 import RequestType from '../models/request-type';
 import CategoryTypes from '../dictionaries/categoryTypes';
+import * as HolidayRequestStatuses from '../dictionaries/holiday-request-statuses';
 import { DbService } from './../services/db-service';
 const dbService = new DbService();
 
@@ -49,6 +50,7 @@ export class HolidayService {
         await dbService.updateHolidayContainer(container);
 
         holidayRequest.isActive = true;
+        holidayRequest.status = HolidayRequestStatuses.StatusesIds.waitingForApprove;
         return dbService.createHolidayRequest(holidayRequest);
     }
 
@@ -58,5 +60,18 @@ export class HolidayService {
 
     async updateHolidayRequest(holidayRequest: HolidayRequest): Promise<HolidayRequest> {
         return dbService.updateHolidayRequest(holidayRequest);
+    }
+
+    async updateHolidayRequestStatus(id: string, status: string): Promise<HolidayRequest> {
+        return new Promise<HolidayRequest>((resolve, reject) => {
+            dbService.getHolidayRequest(id)
+            .then(request => {
+                request.status = status;
+                return request;
+            })
+            .then(request => dbService.updateHolidayRequest(request))
+            .then(result => resolve(result))
+            .catch(err => reject(err));
+        });
     }
 }

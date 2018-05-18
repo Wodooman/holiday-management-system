@@ -53,6 +53,10 @@ const holidayService = new HolidayService();
  *       creationDate:
  *         type: string
  *         format: date
+ *   HolidayRequestUpdate:
+ *     properties:
+ *       status:
+ *         type: string
  *   HolidayUpdate:
  *     properties:
  *       userId:
@@ -82,12 +86,8 @@ const holidayService = new HolidayService();
  */
 router.get('/api/holidays', (req: Request, res: Response, next: express.NextFunction) => {
   holidayService.getAllHolidayContainers()
-    .then(result => {
-      res.send(result);
-    })
-    .catch(err => {
-      return next(err);
-    });
+    .then(result => res.send(result))
+    .catch(err => next(err));
 });
 
 /**
@@ -140,9 +140,7 @@ router.post('/api/holidays', (req: Request, res: Response, next: express.NextFun
         return next(new ResponseError('Container for this user already exists', 400));
       }
     })
-    .catch(err => {
-      return next(err);
-    });
+    .catch(err => next(err));
 });
 
 /**
@@ -171,9 +169,7 @@ router.post('/api/holidays', (req: Request, res: Response, next: express.NextFun
 router.get('/api/holidays/:userId', (req: Request, res: Response, next: express.NextFunction) => {
   holidayService.getHolidayContainer(parseInt(req.params.userId, 10))
     .then(result => res.send(result))
-    .catch(err => {
-      return next(err);
-    });
+    .catch(err => next(err));
 });
 
 /**
@@ -196,9 +192,7 @@ router.get('/api/holidays/:userId', (req: Request, res: Response, next: express.
 router.get('/api/holidayRequests', (req: Request, res: Response, next: express.NextFunction) => {
   holidayService.getHolidayRequests()
     .then((result: Array<HolidayRequest>) => res.send(result))
-    .catch(err => {
-      return next(err);
-    });
+    .catch(err => next(err));
 });
 
 /**
@@ -229,9 +223,7 @@ router.post('/api/holidayRequests', (req: Request, res: Response, next: express.
       res.status(201);
       res.send(createdContainer);
     })
-    .catch(err => {
-      return next(err);
-    });
+    .catch(err => next(err));
 });
 
 /**
@@ -263,6 +255,41 @@ router.get('/api/holidayRequests/:userId', (req: Request, res: Response, next: e
     .catch(err => {
       return next(err);
     });
+});
+
+/**
+ * @swagger
+ * /api/holidayRequests/{requestId}:
+ *   patch:
+ *     tags:
+ *       - HolidayRequests
+ *     description:  Update of a holiday request
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: requestId
+ *         description: Request id
+ *         in: path
+ *         required: true
+ *         type: string
+ *       - name: holidayRequestUpdate
+ *         description: HolidayRequestUpdate object
+ *         in: body
+ *         required: true
+ *         schema:
+ *           $ref: '#/definitions/HolidayRequestUpdate'
+ *     responses:
+ *       200:
+ *         description: Updated request
+ *         schema:
+ *           $ref: '#/definitions/HolidayRequest'
+ *       500:
+ *         description: Internal error
+ */
+router.patch('/api/holidayRequests/:requestId', (req: Request, res: Response, next: express.NextFunction) => {
+  holidayService.updateHolidayRequestStatus(req.params.requestId, req.body.status)
+    .then(result => res.send(result))
+    .catch(err => next(err));
 });
 
 /**

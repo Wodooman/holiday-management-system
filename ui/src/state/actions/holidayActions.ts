@@ -57,3 +57,29 @@ export const getAllRequestsSuccess: ActionCreator<GetAllRequestsAction> = (reque
     type: TypeKeys.GET_ALL_REQUESTS,
     requests
 });
+
+export interface CancelHolidayRequestAction {
+    type: TypeKeys.CANCEL_HOLIDAY_REQUEST;
+    holidayRequestId: string;
+}
+
+export const cancelHolidayRequest: ActionCreator<ThunkAction<Promise<CancelHolidayRequestAction>, State, void>> =
+    (holidayRequestId: string) => {
+        return async (dispatch: Dispatch<State>, getState): Promise<CancelHolidayRequestAction> => {
+            try {
+                dispatch(showProgress());
+                await holidayService.cancelHolidayRequest(holidayRequestId);
+                dispatch(hideProgress());
+                return dispatch(cancelHolidayRequestSuccess(holidayRequestId));
+            } catch (error) {
+                dispatch(hideProgress());
+                throw error;
+            }
+        };
+    };
+
+export const cancelHolidayRequestSuccess: ActionCreator<CancelHolidayRequestAction>
+    = (holidayRequestId: string) => ({
+        type: TypeKeys.CANCEL_HOLIDAY_REQUEST,
+        holidayRequestId: holidayRequestId
+    });

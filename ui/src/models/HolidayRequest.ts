@@ -6,7 +6,8 @@ export default class HolidayRequest {
                 public readonly type: string,
                 public readonly comment: string,
                 public readonly userId: number,
-                public readonly creationDate: Date
+                public readonly creationDate: Date,
+                public readonly status: string
             ) {
     }
 }

@@ -8,7 +8,7 @@ export default class HolidayRequest {
         public readonly type: string,
         public readonly comment: string,
         public readonly creationDate: Date,
-        public readonly status: string,
-        public isActive: boolean = true
+        public isActive: boolean = true,
+        public status: string
     ) { }
 }

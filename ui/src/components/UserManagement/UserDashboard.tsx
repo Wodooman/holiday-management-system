@@ -8,6 +8,7 @@ import * as PropTypes from 'prop-types';
 import { RouterChildContext } from 'react-router';
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import { getUserDeatails, GetUserDetailsAction } from '../../state/actions/userActions';
+import { cancelHolidayRequest, CancelHolidayRequestAction } from '../../state/actions/holidayActions';
 
 import Button from 'material-ui/Button';
 import AddIcon from 'material-ui-icons/Add';
@@ -16,10 +17,15 @@ import * as Formatter from '../../utilities/Formatter';
 interface UserDashboardProps {
     user: User;
     getUserDeatails: (id: number) => Promise<GetUserDetailsAction>;
+    cancelHolidayRequest: (id: string) => Promise<CancelHolidayRequestAction>;
     match: any;
 }
 
-class UserDashboard extends React.Component<UserDashboardProps, {}> {
+interface UserDashboardState {
+    isLoading: boolean;
+}
+
+class UserDashboard extends React.Component<UserDashboardProps, UserDashboardState> {
     static contextTypes = {
         router: PropTypes.any.isRequired
     };
@@ -28,11 +34,16 @@ class UserDashboard extends React.Component<UserDashboardProps, {}> {
         super(props);
     }
 
-    async componentDidMount() {
+    async refreshDetails() {
+        this.setState({ isLoading: true });
         const userId = this.props.match.params.id ? Number(this.props.match.params.id) : 0;
         await this.props.getUserDeatails(userId);
 
         this.setState({ isLoading: false });
+    }
+    
+    async componentDidMount() {
+        await this.refreshDetails();
     }
 
     addRequestClick(event: Event) {
@@ -40,8 +51,14 @@ class UserDashboard extends React.Component<UserDashboardProps, {}> {
         this.context.router.history.push(`/holidayRequests/create/${this.props.user.id}`);
     }
 
+    async cancelClick(id: string, event: Event) {
+        event.preventDefault();
+        await this.props.cancelHolidayRequest(id);
+        await this.refreshDetails();
+    }
+
     render() {
-        if (!this.props.user) {
+        if (!this.props.user || this.state.isLoading) {
             return (
                 <div>
                     Loading information...
@@ -119,6 +136,8 @@ class UserDashboard extends React.Component<UserDashboardProps, {}> {
                                 <TableCell>Category</TableCell>
                                 <TableCell>Comment</TableCell>
                                 <TableCell>Creation date</TableCell>
+                                <TableCell>Status</TableCell>
+                                <TableCell/>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -135,6 +154,12 @@ class UserDashboard extends React.Component<UserDashboardProps, {}> {
                                         <TableCell>{n.comment}</TableCell>
                                         <TableCell>
                                             {Formatter.formatDate(n.creationDate)}
+                                        </TableCell>
+                                        <TableCell>{Formatter.resolveHolidayRequestStatus(n.status)}</TableCell>
+                                        <TableCell>
+                                            {(n.status === 'waitingForApprove' || n.status === 'approved') && 
+                                                <Button variant="raised" color="primary" onClick={this.cancelClick.bind(this, n._id)}>Cancel</Button>
+                                            }
                                         </TableCell>
                                     </TableRow>
                             ) : ''} 
@@ -155,7 +180,8 @@ const mapStateToProps = (state: State, ownProps: any) => {
 };
 
 const mapDispatchToProps = (dispatch: Dispatch<State>) => ({
-    getUserDeatails: (id: Number) => dispatch(getUserDeatails(id))
+    getUserDeatails: (id: Number) => dispatch(getUserDeatails(id)),
+    cancelHolidayRequest: (id: string) => dispatch(cancelHolidayRequest(id))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserDashboard);

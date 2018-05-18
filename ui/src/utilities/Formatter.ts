@@ -1,5 +1,6 @@
 import RequestTypes from '../dictionaries/RequestTypes';
 import HolidayAmountTypes from '../dictionaries/HolidayAmountTypes';
+import * as HolidayRequestStatuses from '../dictionaries/HolidayRequestStatuses';
 
 export function formatDate(date: Date | undefined): string {
     try {
@@ -24,5 +25,12 @@ export function resolveHolidayAmountType(typeId: string | undefined) {
     if (!typeId) { return ''; }
 
     let type = HolidayAmountTypes().find(c => c.id === typeId);
+    return type ? type.Name : '';
+}
+
+export function resolveHolidayRequestStatus(typeId: string | undefined) {
+    if (!typeId) { return ''; }
+
+    let type = HolidayRequestStatuses.getStatuses().find(c => c.id === typeId);
     return type ? type.Name : '';
 }
