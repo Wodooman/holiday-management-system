@@ -28,7 +28,7 @@ export default class HolidayService {
         return this._holidayApi.getHolidaysForUser(userId);
     }
 
-    async cancelHolidayRequest(holidayRequestId: string): Promise<HolidayRequest> {
-        return this._holidayApi.changeHolidayRequestStatus(holidayRequestId, 'cancelledByUser');
+    async changeHolidayRequestStatus(holidayRequestId: string, status: string): Promise<HolidayRequest> {
+        return this._holidayApi.changeHolidayRequestStatus(holidayRequestId, status);
     }
 }

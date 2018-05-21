@@ -181,7 +181,7 @@ export default class HolidayApi {
     formatHolidayRequest(data: HolidayRequestContract): HolidayRequest {
         return new HolidayRequest(
             data._id, new Date(data.startDate), new Date(data.endDate), 
-            data.days, data.type, data.comment, data.userId, new Date(data.creationDate), data.status);
+            data.days, data.type, data.comment, data.userId, new Date(data.creationDate), data.status, undefined);
     }
 
     formatHolidayContainer(data: HolidayContainerContract): HolidayContainer {

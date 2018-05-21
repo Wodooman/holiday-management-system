@@ -141,8 +141,9 @@ export class DbService {
                     const db = client.db(appConfig.mainDbName);
                     const collection = db.collection(holidayRequestCollection);
                     let request = userId === undefined ? {} : { 'userId': userId, 'isActive': true };
+                    let sort = { creationDate: -1 };
 
-                    collection.find(request).toArray((err, result) => {
+                    collection.find(request).sort(sort).toArray((err, result) => {
                         client.close();
 
                         if (err) { throw err; }
@@ -171,7 +172,7 @@ export class DbService {
 
                         if (err) { throw err; }
                         if (!document) {
-                            reject('No holiday request with such Id');
+                            throw 'No holiday request with such Id';
                         } else {
                             resolve(document);
                         }

@@ -1,21 +1,18 @@
 import { TypeKeys } from './typeKeys';
 import { showProgress, hideProgress } from './progressActions';
 import HolidayService from '../../services/HolidayService';
+import UserService from '../../services/UserService';
 import HolidayRequest from '../../models/HolidayRequest';
 import { Dispatch, ActionCreator } from 'react-redux';
 import State from '../reducers/State';
 import { ThunkAction } from 'redux-thunk';
 
 const holidayService = new HolidayService();
+const userService = new UserService();
 
 export interface CreateRequestAction {
     type: TypeKeys.CREATE_REQUEST;
     holidayRequest: HolidayRequest;
-}
-
-export interface GetAllRequestsAction {
-    type: TypeKeys.GET_ALL_REQUESTS;
-    requests: Array<HolidayRequest>;
 }
 
 export const createHolidayRequest: ActionCreator<ThunkAction<Promise<CreateRequestAction>, State, void>>
@@ -38,12 +35,22 @@ export const createHolidayRequestSuccess: ActionCreator<CreateRequestAction> = (
     holidayRequest
 });
 
+export interface GetAllRequestsAction {
+    type: TypeKeys.GET_ALL_REQUESTS;
+    requests: Array<HolidayRequest>;
+}
+
 export const getAllRequests: ActionCreator<ThunkAction<Promise<GetAllRequestsAction>, State, void>> =
     () => {
         return async (dispatch: Dispatch<State>): Promise<GetAllRequestsAction> => {
             try {
                 dispatch(showProgress());
-                const requests = await holidayService.getAllHolidayRequests();
+                let requests = await holidayService.getAllHolidayRequests();
+                let users = await userService.getAllUsers();
+                requests.forEach((request: HolidayRequest)  => {
+                    request.user = users.find(u => u.id === request.userId);
+                });
+
                 dispatch(hideProgress());
                 return dispatch(getAllRequestsSuccess(requests));
             } catch (error) {
@@ -58,19 +65,20 @@ export const getAllRequestsSuccess: ActionCreator<GetAllRequestsAction> = (reque
     requests
 });
 
-export interface CancelHolidayRequestAction {
-    type: TypeKeys.CANCEL_HOLIDAY_REQUEST;
+export interface ChangeHolidayRequestStatusAction {
+    type: TypeKeys.CHANGE_HOLIDAY_REQUEST_STATUS;
     holidayRequestId: string;
+    status: string;
 }
 
-export const cancelHolidayRequest: ActionCreator<ThunkAction<Promise<CancelHolidayRequestAction>, State, void>> =
-    (holidayRequestId: string) => {
-        return async (dispatch: Dispatch<State>, getState): Promise<CancelHolidayRequestAction> => {
+export const changeHolidayRequestStatus: ActionCreator<ThunkAction<Promise<ChangeHolidayRequestStatusAction>, State, void>> =
+    (holidayRequestId: string, status: string) => {
+        return async (dispatch: Dispatch<State>, getState): Promise<ChangeHolidayRequestStatusAction> => {
             try {
                 dispatch(showProgress());
-                await holidayService.cancelHolidayRequest(holidayRequestId);
+                await holidayService.changeHolidayRequestStatus(holidayRequestId, status);
                 dispatch(hideProgress());
-                return dispatch(cancelHolidayRequestSuccess(holidayRequestId));
+                return dispatch(changeHolidayRequestStatusSuccess(holidayRequestId));
             } catch (error) {
                 dispatch(hideProgress());
                 throw error;
@@ -78,8 +86,9 @@ export const cancelHolidayRequest: ActionCreator<ThunkAction<Promise<CancelHolid
         };
     };
 
-export const cancelHolidayRequestSuccess: ActionCreator<CancelHolidayRequestAction>
-    = (holidayRequestId: string) => ({
-        type: TypeKeys.CANCEL_HOLIDAY_REQUEST,
-        holidayRequestId: holidayRequestId
+export const changeHolidayRequestStatusSuccess: ActionCreator<ChangeHolidayRequestStatusAction>
+    = (holidayRequestId: string, status: string) => ({
+        type: TypeKeys.CHANGE_HOLIDAY_REQUEST_STATUS,
+        holidayRequestId: holidayRequestId,
+        status: status
     });

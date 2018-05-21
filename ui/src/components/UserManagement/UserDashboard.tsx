@@ -1,23 +1,26 @@
 import * as React from 'react';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
+import { RouterChildContext } from 'react-router';
+import * as PropTypes from 'prop-types';
+
+import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
+import Button from 'material-ui/Button';
+import AddIcon from 'material-ui-icons/Add';
+import Delete from 'material-ui-icons/Delete';
+
 import User from '../../models/User';
 import State from '../../state/reducers/State';
 import CardPage from '../common/CardPage';
-import * as PropTypes from 'prop-types';
-import { RouterChildContext } from 'react-router';
-import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import { getUserDeatails, GetUserDetailsAction } from '../../state/actions/userActions';
-import { cancelHolidayRequest, CancelHolidayRequestAction } from '../../state/actions/holidayActions';
-
-import Button from 'material-ui/Button';
-import AddIcon from 'material-ui-icons/Add';
+import { changeHolidayRequestStatus, ChangeHolidayRequestStatusAction } from '../../state/actions/holidayActions';
 import * as Formatter from '../../utilities/Formatter';
+import * as HolidayRequestStatuses from '../../dictionaries/HolidayRequestStatuses';
 
 interface UserDashboardProps {
     user: User;
     getUserDeatails: (id: number) => Promise<GetUserDetailsAction>;
-    cancelHolidayRequest: (id: string) => Promise<CancelHolidayRequestAction>;
+    changeHolidayRequestStatus: (id: string, status: string) => Promise<ChangeHolidayRequestStatusAction>;
     match: any;
 }
 
@@ -30,8 +33,12 @@ class UserDashboard extends React.Component<UserDashboardProps, UserDashboardSta
         router: PropTypes.any.isRequired
     };
     context: RouterChildContext<{}>;
+    
     constructor(props: UserDashboardProps) {
         super(props);
+        this.state = {
+            isLoading: true
+        };
     }
 
     async refreshDetails() {
@@ -53,12 +60,12 @@ class UserDashboard extends React.Component<UserDashboardProps, UserDashboardSta
 
     async cancelClick(id: string, event: Event) {
         event.preventDefault();
-        await this.props.cancelHolidayRequest(id);
+        await this.props.changeHolidayRequestStatus(id, HolidayRequestStatuses.StatusesIds.cancelledByUser);
         await this.refreshDetails();
     }
 
     render() {
-        if (!this.props.user || this.state.isLoading) {
+        if (this.state.isLoading) {
             return (
                 <div>
                     Loading information...
@@ -158,7 +165,9 @@ class UserDashboard extends React.Component<UserDashboardProps, UserDashboardSta
                                         <TableCell>{Formatter.resolveHolidayRequestStatus(n.status)}</TableCell>
                                         <TableCell>
                                             {(n.status === 'waitingForApprove' || n.status === 'approved') && 
-                                                <Button variant="raised" color="primary" onClick={this.cancelClick.bind(this, n._id)}>Cancel</Button>
+                                                <Button variant="raised" color="primary" onClick={this.cancelClick.bind(this, n._id)}>
+                                                    Cancel <Delete/>
+                                                </Button>
                                             }
                                         </TableCell>
                                     </TableRow>
@@ -181,7 +190,7 @@ const mapStateToProps = (state: State, ownProps: any) => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>) => ({
     getUserDeatails: (id: Number) => dispatch(getUserDeatails(id)),
-    cancelHolidayRequest: (id: string) => dispatch(cancelHolidayRequest(id))
+    changeHolidayRequestStatus: (id: string, status: string) => dispatch(changeHolidayRequestStatus(id, status))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserDashboard);

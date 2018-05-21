@@ -16,4 +16,8 @@ export function getStatuses(): HolidayRequestStatus[] {
     ];
 }
 
+export function getStatusById(id: string): HolidayRequestStatus {
+    return this.getStatuses().find((c: HolidayRequestStatus) => c.id === id);
+}
+
 export let StatusesIds = statusesIds;
