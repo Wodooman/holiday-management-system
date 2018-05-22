@@ -29,7 +29,7 @@ export async function execute(): Promise<void> {
             const isFirstMonth = container.startDate <= today && today <= firstMonth;
 
             if (startWorking && (!isFirstMonth || container.isFirstMonthCounted)) {
-                var daysToAdd = appConfig.holidayConfig[container.holidaysPerYear][currentMonth];
+                var daysToAdd = appConfig.holidayConfig.holdiayDays[container.holidaysPerYear][currentMonth];
                 normalHolidays.available += daysToAdd;
                 normalHolidays.sum += daysToAdd;
                 await holidayService.updateHolidayContainer(container).catch(err => { throw err; });

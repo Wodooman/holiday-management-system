@@ -87,7 +87,7 @@ export class HolidayService {
                         throw `There is no status with name '${status}'`;
                     }
 
-                    if (appConfig.holidayRequestTransitions[request.status].findIndex(s => s === status) < 0) {
+                    if (appConfig.holidayConfig.holidayRequestTransitions[request.status].findIndex(s => s === status) < 0) {
                         throw `The transition to status '${statusObject.Name}' is prohibited for this holiday request`;
                     }
 

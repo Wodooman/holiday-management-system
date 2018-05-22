@@ -1,0 +1,12 @@
+{
+    "holdiayDays": {
+        "holidays20": [2, 2, 2, 2, 2, 1, 2, 1, 2, 1, 2, 1],
+        "holidays26": [3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+    },
+    "holidayRequestTransitions": {
+        "waitingForApprove": ["approved", "rejected", "cancelledByUser"],
+        "approved": ["cancelledByUser"],
+        "rejected": [],
+        "cancelledByUser": []
+    }
+}

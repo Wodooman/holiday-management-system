@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import CardPage from '../common/CardPage';
 import { Table, TableHead, TableRow, TableCell, TableBody } from 'material-ui';
-import Button from 'material-ui/Button';
+import IconButton from 'material-ui/IconButton';
 import Check from 'material-ui-icons/Check';
 import Cancel from 'material-ui-icons/Cancel';
 
@@ -100,13 +100,13 @@ class RequestList extends React.Component<RequestsListProps, RequestListState> {
                                 <TableCell>
                                     {(row.status === 'waitingForApprove') && 
                                         <div>
-                                            <Button variant="raised" color="primary" onClick={this.approveClick.bind(this, row._id)}>
-                                                Approve <Check/>
-                                            </Button>
+                                            <IconButton color="primary" aria-label="Approve" onClick={this.approveClick.bind(this, row._id)}>
+                                                <Check />
+                                            </IconButton>
                                             &nbsp;
-                                            <Button variant="raised" color="secondary" onClick={this.rejectClick.bind(this, row._id)}>
-                                                Reject <Cancel/>
-                                            </Button>
+                                            <IconButton color="secondary" aria-label="Reject" onClick={this.rejectClick.bind(this, row._id)}>
+                                                <Cancel />
+                                            </IconButton>
                                         </div>
                                     }
                                 </TableCell>
