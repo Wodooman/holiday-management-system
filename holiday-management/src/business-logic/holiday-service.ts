@@ -1,32 +1,30 @@
 import * as config from 'config';
 
-import HolidayContainer from '../models/holiday-container';
-import HolidayContainerRow from '../models/holiday-container-row';
-import HolidayUpdate from '../models/holiday-update';
-import HolidayRequest from '../models/HolidayRequest';
-import RequestType from '../models/request-type';
 import CategoryTypes from '../dictionaries/categoryTypes';
 import * as HolidayRequestStatuses from '../dictionaries/holiday-request-statuses';
-import { DbService } from './../services/db-service';
 import AppConfiguration from '../interfaces/app-configuration';
+import HolidayContainer from '../models/holiday-container';
+import HolidayContainerRow from '../models/holiday-container-row';
+import HolidayRequest from '../models/HolidayRequest';
+import { DbService } from './../services/db-service';
 
 const dbService = new DbService();
 const appConfig = config.get('Config') as AppConfiguration;
 
 export class HolidayService {
-    testConnection(): Promise<string> {
+    public testConnection(): Promise<string> {
         return dbService.testConnection();
     }
 
-    getAllHolidayContainers(year: number = null): Promise<Array<HolidayContainer>> {
+    public getAllHolidayContainers(year: number = null): Promise<HolidayContainer[]> {
         return dbService.getAllHolidayContainers(year);
     }
 
-    createHolidayContainer(holidayContainer: HolidayContainer): Promise<HolidayContainer> {
+    public createHolidayContainer(holidayContainer: HolidayContainer): Promise<HolidayContainer> {
         if (!holidayContainer.categories) {
             holidayContainer.categories = new Array<HolidayContainerRow>();
-            CategoryTypes().forEach(category => {
-                var available = category.id === 'holidayOnRequest' ? 4 : 0;
+            CategoryTypes().forEach((category) => {
+                const available = category.id === 'holidayOnRequest' ? 4 : 0;
                 holidayContainer.categories.push(new HolidayContainerRow(category.id, available, 0, available));
             });
         }
@@ -34,22 +32,22 @@ export class HolidayService {
         return dbService.createHolidayContainer(holidayContainer);
     }
 
-    getHolidayContainer(userId: number): Promise<HolidayContainer> {
+    public getHolidayContainer(userId: number): Promise<HolidayContainer> {
         return dbService.getHolidayContainer(userId);
     }
 
-    deleteAllHolidayContainers(): Promise<void> {
+    public deleteAllHolidayContainers(): Promise<void> {
         return dbService.deleteAllHolidayContainers();
     }
 
-    async updateHolidayContainer(container: HolidayContainer): Promise<HolidayContainer> {
+    public async updateHolidayContainer(container: HolidayContainer): Promise<HolidayContainer> {
         return dbService.updateHolidayContainer(container);
     }
 
-    async createHolidayRequest(holidayRequest: HolidayRequest): Promise<HolidayRequest> {
-        let container = await dbService.getHolidayContainer(holidayRequest.userId);
-        let category = container.categories.find((c: HolidayContainerRow) => c.category === holidayRequest.type);
-        //TODO: for normal holidays - take first from prev year and then from Normal
+    public async createHolidayRequest(holidayRequest: HolidayRequest): Promise<HolidayRequest> {
+        const container = await dbService.getHolidayContainer(holidayRequest.userId);
+        const category = container.categories.find((c: HolidayContainerRow) => c.category === holidayRequest.type);
+        // TODO: for normal holidays - take first from prev year and then from Normal
         category.taken += holidayRequest.days;
         category.sum -= holidayRequest.days;
         await dbService.updateHolidayContainer(container);
@@ -59,9 +57,9 @@ export class HolidayService {
         return dbService.createHolidayRequest(holidayRequest);
     }
 
-    async cancelHolidayRequest(holidayRequest: HolidayRequest): Promise<HolidayRequest> {
-        let container = await dbService.getHolidayContainer(holidayRequest.userId);
-        let category = container.categories.find((c: HolidayContainerRow) => c.category === holidayRequest.type);
+    public async cancelHolidayRequest(holidayRequest: HolidayRequest): Promise<HolidayRequest> {
+        const container = await dbService.getHolidayContainer(holidayRequest.userId);
+        const category = container.categories.find((c: HolidayContainerRow) => c.category === holidayRequest.type);
 
         category.taken -= holidayRequest.days;
         category.sum += holidayRequest.days;
@@ -70,41 +68,37 @@ export class HolidayService {
         return holidayRequest;
     }
 
-    getHolidayRequests(userId?: number): Promise<Array<HolidayRequest>> {
+    public getHolidayRequests(userId?: number): Promise<HolidayRequest[]> {
         return dbService.getHolidayRequests(userId);
     }
 
-    async updateHolidayRequest(holidayRequest: HolidayRequest): Promise<HolidayRequest> {
+    public async updateHolidayRequest(holidayRequest: HolidayRequest): Promise<HolidayRequest> {
         return dbService.updateHolidayRequest(holidayRequest);
     }
 
-    async updateHolidayRequestStatus(id: string, status: string): Promise<HolidayRequest> {
-        return new Promise<HolidayRequest>((resolve, reject) => {
-            dbService.getHolidayRequest(id)
-                .then(request => {
-                    let statusObject = HolidayRequestStatuses.getStatusById(status);
+    public async updateHolidayRequestStatus(id: string, status: string): Promise<HolidayRequest> {
+        return dbService.getHolidayRequest(id)
+                .then((request) => {
+                    const statusObject = HolidayRequestStatuses.getStatusById(status);
                     if (!statusObject) {
-                        throw `There is no status with name '${status}'`;
+                        throw new Error(`There is no status with name '${status}'`);
                     }
 
-                    if (appConfig.holidayConfig.holidayRequestTransitions[request.status].findIndex(s => s === status) < 0) {
-                        throw `The transition to status '${statusObject.Name}' is prohibited for this holiday request`;
+                    if (appConfig.holidayConfig.holidayRequestTransitions[request.status].findIndex((s) => s === status) < 0) {
+                        throw new Error(`The transition to status '${statusObject.Name}' is prohibited for this holiday request`);
                     }
 
                     request.status = status;
                     return request;
                 })
-                .then(request => dbService.updateHolidayRequest(request))
-                .then(request => {
+                .then((request) => dbService.updateHolidayRequest(request))
+                .then((request) => {
                     if (request.status === HolidayRequestStatuses.StatusesIds.cancelledByUser
                         || request.status === HolidayRequestStatuses.StatusesIds.rejected) {
                             return this.cancelHolidayRequest(request);
                     } else {
                         return request;
                     }
-                })
-                .then(result => resolve(result))
-                .catch(err => reject(err));
-        });
+                });
     }
 }

@@ -1,11 +1,11 @@
 interface HolidayDaysConfiguration {
-    [key: string]: Array<number>;
-    holidays20: Array<number>;
-    holidays26: Array<number>;
+    [key: string]: number[];
+    holidays20: number[];
+    holidays26: number[];
 }
 
 interface HolidayRequestConfiguration {
-    [key: string]: Array<string>;
+    [key: string]: string[];
 }
 
 interface HolidayConfiguration {

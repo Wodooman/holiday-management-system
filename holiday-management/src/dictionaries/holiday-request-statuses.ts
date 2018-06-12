@@ -1,10 +1,10 @@
 import HolidayRequestStatus from './../models/holiday-request-status';
 
-let statusesIds = {
-    waitingForApprove: 'waitingForApprove',
+const statusesIds = {
     approved: 'approved',
+    cancelledByUser: 'cancelledByUser',
     rejected: 'rejected',
-    cancelledByUser: 'cancelledByUser'
+    waitingForApprove: 'waitingForApprove'
 };
 
 export function getStatuses(): HolidayRequestStatus[] {

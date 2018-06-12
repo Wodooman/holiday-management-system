@@ -1,4 +1,5 @@
 {
+    "extends": "tslint:recommended",
     "rules": {
         "align": [
             true,
@@ -9,6 +10,7 @@
         "ban": false,
         "class-name": true,
         "curly": true,
+        "deprecation": true,
         "eofline": false,
         "forin": true,
         "indent": [ true, "spaces" ],
@@ -17,8 +19,6 @@
         "max-line-length": [ true, 150 ],
         "member-ordering": [
             true,
-            "public-before-private",
-            "static-before-instance",
             "variables-before-functions"
         ],
         "no-any": true,

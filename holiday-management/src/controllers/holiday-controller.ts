@@ -87,7 +87,7 @@ const holidayService = new HolidayService();
 router.get('/api/holidays', (req: Request, res: Response, next: express.NextFunction) => {
   holidayService.getAllHolidayContainers()
     .then(result => res.send(result))
-    .catch(err => next(err));
+    .catch(next);
 });
 
 /**
@@ -133,14 +133,12 @@ router.post('/api/holidays', (req: Request, res: Response, next: express.NextFun
             res.status(201);
             res.send(createdContainer);
           })
-          .catch(err => {
-            return next(err);
-          });
+          .catch(next);
       } else {
         return next(new ResponseError('Container for this user already exists', 400));
       }
     })
-    .catch(err => next(err));
+    .catch(next);
 });
 
 /**
@@ -169,7 +167,7 @@ router.post('/api/holidays', (req: Request, res: Response, next: express.NextFun
 router.get('/api/holidays/:userId', (req: Request, res: Response, next: express.NextFunction) => {
   holidayService.getHolidayContainer(parseInt(req.params.userId, 10))
     .then(result => res.send(result))
-    .catch(err => next(err));
+    .catch(next);
 });
 
 /**
@@ -191,8 +189,8 @@ router.get('/api/holidays/:userId', (req: Request, res: Response, next: express.
  */
 router.get('/api/holidayRequests', (req: Request, res: Response, next: express.NextFunction) => {
   holidayService.getHolidayRequests()
-    .then((result: Array<HolidayRequest>) => res.send(result))
-    .catch(err => next(err));
+    .then(result => res.send(result))
+    .catch(next);
 });
 
 /**
@@ -223,7 +221,7 @@ router.post('/api/holidayRequests', (req: Request, res: Response, next: express.
       res.status(201);
       res.send(createdContainer);
     })
-    .catch(err => next(err));
+    .catch(next);
 });
 
 /**
@@ -252,9 +250,7 @@ router.post('/api/holidayRequests', (req: Request, res: Response, next: express.
 router.get('/api/holidayRequests/:userId', (req: Request, res: Response, next: express.NextFunction) => {
   holidayService.getHolidayRequests(parseInt(req.params.userId, 10))
     .then(result => res.send(result))
-    .catch(err => {
-      return next(err);
-    });
+    .catch(next);
 });
 
 /**
@@ -289,7 +285,7 @@ router.get('/api/holidayRequests/:userId', (req: Request, res: Response, next: e
 router.patch('/api/holidayRequests/:requestId', (req: Request, res: Response, next: express.NextFunction) => {
   holidayService.updateHolidayRequestStatus(req.params.requestId, req.body.status)
     .then(result => res.send(result))
-    .catch(err => next(err));
+    .catch(next);
 });
 
 /**
@@ -332,9 +328,7 @@ router.post('/api/holidayUpdates', async (req: Request, res: Response, next: exp
       res.status(201);
       res.send(result);
     })
-    .catch(err => {
-      return next(err);
-    });
+    .catch(next);
 });
 
 export { router };
