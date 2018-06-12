@@ -1,3 +1,5 @@
+import User from './User';
+
 export default class HolidayRequest {
     constructor(public readonly _id: string,
                 public readonly startDate: Date,
@@ -6,7 +8,9 @@ export default class HolidayRequest {
                 public readonly type: string,
                 public readonly comment: string,
                 public readonly userId: number,
-                public readonly creationDate: Date
+                public readonly creationDate: Date,
+                public readonly status: string,
+                public user: User | undefined
             ) {
     }
 }

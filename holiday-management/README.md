@@ -8,9 +8,10 @@ gulp-cli
 ## Installing
 
 ```
-npm install gulp -g
+npm install gulp tslint typescript -g
 npm install
 create folder "C:\data\db" for MongoDB
+
 ```
 
 ## Building

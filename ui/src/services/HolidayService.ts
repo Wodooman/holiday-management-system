@@ -27,4 +27,8 @@ export default class HolidayService {
     async getHolidayContainer(userId: number): Promise<HolidayContainer> {
         return this._holidayApi.getHolidaysForUser(userId);
     }
+
+    async changeHolidayRequestStatus(holidayRequestId: string, status: string): Promise<HolidayRequest> {
+        return this._holidayApi.changeHolidayRequestStatus(holidayRequestId, status);
+    }
 }

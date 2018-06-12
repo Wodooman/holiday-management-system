@@ -1,7 +1,16 @@
+interface HolidayDaysConfiguration {
+    [key: string]: number[];
+    holidays20: number[];
+    holidays26: number[];
+}
+
+interface HolidayRequestConfiguration {
+    [key: string]: string[];
+}
+
 interface HolidayConfiguration {
-    [key: string]: Array<number>;
-    holidays20: Array<number>;
-    holidays26: Array<number>;
+    holdiayDays: HolidayDaysConfiguration;
+    holidayRequestTransitions: HolidayRequestConfiguration;
 }
 
 export default interface AppConfiguration {

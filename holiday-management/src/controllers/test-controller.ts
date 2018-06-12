@@ -1,9 +1,8 @@
 import * as express from 'express';
-import HolidayUpdate from '../models/holiday-update';
 import { Request, Response } from 'express-serve-static-core';
-import { HolidayService } from './../business-logic/holiday-service';
-import * as MonthlyJob from '../jobs/monthly-job';
 import * as AnnualJob from '../jobs/annual-job';
+import * as MonthlyJob from '../jobs/monthly-job';
+import { HolidayService } from './../business-logic/holiday-service';
 
 const router = express.Router();
 const holidayService = new HolidayService();
@@ -79,10 +78,10 @@ const holidayService = new HolidayService();
  */
 router.get('/api/test', (req: Request, res: Response, next: express.NextFunction) => {
   holidayService.testConnection()
-    .then(val => {
+    .then((val) => {
       res.send(val);
     })
-    .catch(err => {
+    .catch((err) => {
       return next(err);
     });
 });
@@ -104,8 +103,8 @@ router.get('/api/test', (req: Request, res: Response, next: express.NextFunction
  */
 router.get('/api/test/monthly-job', async (req: Request, res: Response, next: express.NextFunction) => {
     MonthlyJob.execute()
-        .then(result => res.send('Success'))
-        .catch(err => {
+        .then(() => res.send('Success'))
+        .catch((err) => {
           return next(err);
         });
 });
@@ -127,8 +126,8 @@ router.get('/api/test/monthly-job', async (req: Request, res: Response, next: ex
  */
 router.get('/api/test/annually-job', async (req: Request, res: Response, next: express.NextFunction) => {
     AnnualJob.execute()
-        .then(result => res.send('Success'))
-        .catch(err => {
+        .then(() => res.send('Success'))
+        .catch((err) => {
           return next(err);
         });
 

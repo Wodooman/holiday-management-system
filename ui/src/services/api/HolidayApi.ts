@@ -63,25 +63,30 @@ export default class HolidayApi {
         });
     }
 
-    async updateHolidays(userId: number, holidaysRemaining: number, comment: string): Promise<HolidayContainer> {
-        const response = await fetch(`/api/holidayUpdates`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userId,
-                // leftHolidays: holidaysRemaining,
-                comment
+    updateHolidays(userId: number, holidaysRemaining: number, comment: string): Promise<HolidayContainer> {
+        return new Promise((resolve, reject) => {
+            fetch(`/api/holidayUpdates`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId,
+                    // leftHolidays: holidaysRemaining,
+                    comment
+                })
             })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error while accessing HolidayService. Details: (${response.status})${response.statusText}`);
+                } else {
+                    return response.json();
+                }
+            })
+            .then((data: HolidayContainerContract) => resolve(this.formatHolidayContainer(data)))
+            .catch(reject);
         });
-
-        if (!response.ok) {
-            throw new Error(`Error while accessing HolidayService. Details: (${response.status})${response.statusText}`);
-        }
-        // const container = <HolidayContainerContract> await response.json();
-        return new HolidayContainer(userId);
     }
 
     createHolidayRequest(userId: number, startDate: Date, endDate: Date, days: number, type: string, comment: string, creationDate: Date)
@@ -149,10 +154,34 @@ export default class HolidayApi {
         });
     }
 
+    changeHolidayRequestStatus(holidayRequestId: string, status: string): Promise<HolidayRequest> {
+        return new Promise((resolve, reject) => {
+            fetch(`/api/holidayRequests/${holidayRequestId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    status: status
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error while accessing HolidayService. Details: (${response.status})${response.statusText}`);
+                } else {
+                    return response.json();
+                }
+            })
+            .then((data: HolidayRequestContract) => resolve(this.formatHolidayRequest(data)))
+            .catch(reject);
+        });
+    }
+
     formatHolidayRequest(data: HolidayRequestContract): HolidayRequest {
         return new HolidayRequest(
             data._id, new Date(data.startDate), new Date(data.endDate), 
-            data.days, data.type, data.comment, data.userId, new Date(data.creationDate));
+            data.days, data.type, data.comment, data.userId, new Date(data.creationDate), data.status, undefined);
     }
 
     formatHolidayContainer(data: HolidayContainerContract): HolidayContainer {
