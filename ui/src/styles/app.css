@@ -15,7 +15,3 @@ body {
 .linkButton {
   cursor: pointer !important;
 }
-
-form div {
-  margin: 20px 0;
-}

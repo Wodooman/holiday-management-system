@@ -7,6 +7,7 @@ import User from '../../models/User';
 import { Dispatch, ActionCreator } from 'react-redux';
 import State from '../reducers/State';
 import { ThunkAction } from 'redux-thunk';
+import HolidayContainerContract from '../../services/api/contracts/HolidayContainerContract';
 
 const userService = new UserService();
 const holidayService = new HolidayService();
@@ -33,11 +34,11 @@ export interface GetUserDetailsAction {
 }
 
 export const registerUser: ActionCreator<ThunkAction<Promise<RegisterUserAction>, State, void>>
-    = (userEmail: string) => {
+    = (userEmail: string, holidays: HolidayContainerContract) => {
         return async (dispatch: Dispatch<State>): Promise<RegisterUserAction> => {
             try {
                 dispatch(showProgress());
-                const user = await userService.registerUser(userEmail);
+                const user = await userService.registerUser(userEmail, holidays);
                 dispatch(hideProgress());
                 return dispatch(registerUserSuccess(user));
             } catch (error) {

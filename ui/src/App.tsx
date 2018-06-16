@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Component, Fragment } from 'react';
-import RegisterUser from './components/UserManagement/RegisterUser';
+import RegisterUserPage from './components/UserManagement/RegisterUser/RegisterUserPage';
 import UserDetailed from './components/UserManagement/UserDetailed';
 import UserDashboard from './components/UserManagement/UserDashboard';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
@@ -46,7 +46,7 @@ class App extends Component<AppProps, {}> {
             />
             <Grid item={true} xs={10} className="root" style={this.props.isDrawerOpen ? { marginLeft: '210px' } : { marginLeft: '30px' }}>
               <Route exact={true} path="/" component={Home} />
-              <Route exact={true} path="/users/register" component={RegisterUser} />
+              <Route exact={true} path="/users/register" component={RegisterUserPage} />
               <Route exact={true} path="/users/details/:id" component={UserDetailed} />
               <Route exact={true} path="/users/view/:id" component={UserDashboard} />
               <Route exact={true} path="/users" component={UsersList} />

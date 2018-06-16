@@ -5,7 +5,7 @@ import HolidayRequestContract from './contracts/HolidayRequestContract';
 
 export default class HolidayApi {
 
-    createHolidayContainerForUser(userId: number): Promise<HolidayContainer> {
+    createHolidayContainerForUser(holidays: HolidayContainerContract): Promise<HolidayContainer> {
         return new Promise((resolve, reject) => {
             fetch('/api/holidays', {
                 method: 'POST',
@@ -13,9 +13,7 @@ export default class HolidayApi {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    userId: userId
-                })
+                body: JSON.stringify(holidays)
             })
                 .then(response => {
                     if (!response.ok) {
