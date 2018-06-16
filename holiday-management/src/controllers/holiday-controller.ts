@@ -115,21 +115,14 @@ router.get('/api/holidays', (req: Request, res: Response, next: express.NextFunc
  *         description: Internal error
  */
 router.post('/api/holidays', (req: Request, res: Response, next: express.NextFunction) => {
-  let userId = parseInt(req.body.userId, 10);
+  const userId = parseInt(req.body.userId, 10);
   holidayService.getHolidayContainer(userId)
-    .then(result => {
+    .then((result) => {
       if (!result) {
-        var container = req.body as HolidayContainer;
-        //TODO: replace later. Needed for testing while UI doesn't send it
-        let date = new Date();
-        container.startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        container.holidaysPerYear = 'holidays26';
-        container.isFirstMonthCounted = true;
-        container.isNewEmployee = true;
-        container.isActive = true;
+        const container = req.body as HolidayContainer;
 
         holidayService.createHolidayContainer(req.body)
-          .then(createdContainer => {
+          .then((createdContainer) => {
             res.status(201);
             res.send(createdContainer);
           })
