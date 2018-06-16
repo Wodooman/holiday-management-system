@@ -1,7 +1,7 @@
 import HolidayContainerRowContract from './HolidayContainerRowContract';
 
 export default interface HolidayContainerContract {
-    userId: number;
+    userId?: number;
     holidaysPerYear: string;
     startDate: string;
     isNewEmployee: boolean;

@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "lodash": "^4.17.10",
     "material-ui": "^1.0.0-beta.34",
     "material-ui-icons": "^1.0.0-beta.17",
+    "material-ui-pickers": "^1.0.0-beta.15.1",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
     "react-addons-css-transition-group": "^15.6.2",
@@ -26,6 +28,7 @@
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.109",
     "@types/jest": "^21.1.8",
     "@types/node": "^8.0.57",
     "@types/prop-types": "^15.5.2",
@@ -36,6 +39,7 @@
     "@types/redux-devtools-extension": "^2.13.2",
     "@types/redux-immutable-state-invariant": "^2.0.4",
     "@types/validator": "^6.3.0",
+    "moment": "^2.20.1",
     "redux-devtools-extension": "^2.13.2"
   },
   "proxy": {

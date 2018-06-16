@@ -2,7 +2,6 @@ import HolidayRequest from '../models/HolidayRequest';
 import HolidayContainer from '../models/HolidayContainer';
 import HolidayApi from './api/HolidayApi';
 
-
 export default class HolidayService {
     private readonly _holidayApi: HolidayApi;
 
